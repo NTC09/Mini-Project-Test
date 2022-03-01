@@ -4,12 +4,12 @@
 
 using namespace std;
 
-float R1=10000;
-float R2=99077.3;
-float R3=56141.6;
-float R4=19993.4;
+float R1=1246.32;
+float R2=10000;
+float R3=32960;
+float R4=133500;
 
-float T[4]={25,-20,-10,10};
+float T[4]={80,25,0,-25};
 
 float a[4][5],x[4]; 
 
