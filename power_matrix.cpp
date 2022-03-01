@@ -15,7 +15,7 @@ public:
     matrix operator * (matrix x);
     matrix operator ^ (unsigned long long n);
     friend ostream& operator<< (ostream& ou, matrix x);
-    unsigned int geta(int i, int j) { return this->a[i][j]; };
+    long long geta(int i, int j) { return this->a[i][j]; };
 };
 ostream& operator<< (ostream& ou, matrix x)
 {
@@ -54,12 +54,12 @@ matrix matrix::operator ^ (unsigned long long n)
        	t.a[i]=new long long [t.m];
     for(int i=0;i<t.n;i++)
 		for(int j=0;j<t.m;j++)
-			t.a[i][j]=this->a[i][j];
+			t.a[i][j]=this->geta(i,j);
     if(n==1) return t;
     if(n%2==0)
         t=(t^(n/2)) * (t^(n/2));
     else 
-        t=t*(((t^(n/2)) * (t^(n/2))));
+        t=(((t^(n/2)) * (t^(n/2))))*t;
     return t;
 }
 
