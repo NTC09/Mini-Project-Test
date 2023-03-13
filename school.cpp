@@ -1,24 +1,24 @@
-#define opt __attribute((optimize("Ofast")))
+#define op __attribute((optimize("Ofast")))
 #define abs(x) ((x < 0) ? -(x) : (x))
 #define distance(x1, y1, x2, y2) (abs((x1) - (x2)) + abs((y1) - (y2)))
 
 class Base {
-public:
+   public:
     int ID;
     int x;
     int y;
-    int heapid;
-};// typedef Type;
+    int heapId;
+} typedef Type;
 
 template <typename Type>
 class Heap {
-private:
-    void* List[1000];
+   private:
+    Type* List[1000];
     bool needErase;
     bool isMaxHeap;
-    void heapifyUp(int index) {
+    op void heapifyUp(int index) {
         register int indx = index,
-            parent = (indx - 1) / 2;
+                     parent = (indx - 1) / 2;
         if (parent >= 0) {
             if (comp(parent, indx))
                 indx = parent;
@@ -28,10 +28,10 @@ private:
             heapifyUp(indx);
         }
     }
-    void heapifyDown(int index) {
+    op void heapifyDown(int index) {
         register int indx = index,
-            left = 2 * indx + 1,
-            right = 2 * indx + 2;
+                     left = 2 * indx + 1,
+                     right = 2 * indx + 2;
         if (left < size)
             if (comp(indx, left))
                 indx = left;
@@ -43,223 +43,216 @@ private:
             heapifyDown(indx);
         }
     }
-    void erase(int index) {
+    op void erase(int index) {
         Swap(index, --this->size);
         heapifyDown(index);
         heapifyUp(index);
     }
-    void Swap(int a, int b) {
-        register void* t = List[a];
+    op void Swap(int a, int b) {
+        register Type* t = List[a];
         List[a] = List[b];
         List[b] = t;
         if (needErase) {
-            ((Type*)List[a])->heapid = a;
-            ((Type*)List[b])->heapid = b;
+            List[a]->heapId = a;
+            List[b]->heapId = b;
         }
     }
-    bool comp(int id1, int id2) {
-        return (*(Type*)List[id1] < *(Type*)List[id2]) == isMaxHeap;
+    op bool comp(int id1, int id2) {
+        return (*List[id1] < *List[id2]) == isMaxHeap;
     }
-public:
+   public:
     unsigned int size;
-    Heap() {
+    op Heap() {
         this->init(false);
     }
-    void init(bool need) {
+    op void init(bool need) {
         this->size = 0;
         needErase = need;
         isMaxHeap = true;
     }
-    void init() {
+    op void init() {
         this->size = 0;
         needErase = false;
         isMaxHeap = false;
     }
-    void insert(void* newValue) {
+    op void insert(Type* newValue) {
         if (size == 1000) {
-            if (*(Type*)newValue < *(Type*)List[this->size - 1])
+            if (*newValue < *List[this->size - 1])
                 erase(this->size - 1);
             else
                 return;
         }
         this->List[this->size] = newValue;
         if (needErase)
-            ((Type*)newValue)->heapid = this->size;
+            newValue->heapId = this->size;
         heapifyUp(this->size++);
     }
     
-    void erase(void* type) {
+    op void erase(Type* type) {
         if (needErase)
-            erase(((Type*)type)->heapid);
+            erase(type->heapId);
     }
-    void update(int index) {
-        heapifyUp(index);
-        heapifyDown(index);
-    }
-    Type* pop() {
+    op Type* pop() {
         Swap(0, --this->size);
         heapifyDown(0);
-        return (Type*)this->List[this->size];
+        return this->List[this->size];
     }
-    Type* top() {
+    op Type* top() {
         if (size == 0)
             return 0;
-        return (Type*)this->List[0];
+        return this->List[0];
     }
 };
 
-class School: public Base {
-public:
-    int distance;
-    void* assigned;
-    void* wishlist;
-    static int number;
-    static int capacity;
-    bool operator<(School& st) const {
-        if (this->distance != st.distance)
-            return this->distance > st.distance;
-        return this->ID > st.ID;
-    }
-    void calculatedistance(int sx, int sy) {
-        distance = distance(x, y, sx, sy);
-    }
-    void* insert(void* student);
-    
-} school[10];
-int School::number;
-int School::capacity;
-
-class Student: public Base {
-public:
+class Student : public Base {
+   public:
     int maxDistance;
-    Student* next;
-    School* schoola;
-    static int numbers;
-    bool operator<(Student& st) const {  // higher priority
+    int next;
+    class School* schoolIn;
+    op bool operator<(Student& st) const {  // higher priority
         if (this->maxDistance != st.maxDistance)
             return this->maxDistance > st.maxDistance;
         return this->ID < st.ID;
     }
-    void calculatedistance() {
-        maxDistance = 0;
-        register int t;
-        for (register int i = 0; i < School::number; i++) {
-            t = distance(x, y, school[i].x, school[i].y);
-            if (maxDistance < t)
-                maxDistance = t;
-        }
-    }
-} student[10000];
-Student* mapStudent[10007];
-Heap<Student> assgined[10];
-Heap<Student> wantAssign[10];
-int Student::numbers = 0;
+    op void calculateDistance();
+};
 
-Student* findStudent(int mID) {
+class School : public Base {
+   public:
+    int distance;
+    class Heap<Student>* assigned;
+    class Heap<Student>* wishlist;
+    School() {
+        assigned = new Heap<Student>;
+        wishlist = new Heap<Student>;
+    }
+    op bool operator<(School& st) const {
+        if (this->distance != st.distance)
+            return this->distance > st.distance;
+        return this->ID > st.ID;
+    }
+    op void calculateDistance(int sx, int sy) {
+        distance = distance(x, y, sx, sy);
+    }
+};
+
+// Finish class define
+
+Student student[10000];
+int mapStudent[10007];
+int studentNumber;
+School school[10];
+int schoolNumber;
+int capacity;
+
+op void Student::calculateDistance() {
+    maxDistance = 0;
+    register int t;
+    for (register int i = 0; i < schoolNumber; i++) {
+        t = distance(x, y, school[i].x, school[i].y);
+        if (maxDistance < t)
+            maxDistance = t;
+    }
+}
+
+op int findStudent(int mID) {
     register int hash = mID % 10007;
-    register Student* st = mapStudent[hash];
-    while (st != 0 && st->ID != mID)
-        st = st->next;
+    register int st = mapStudent[hash];
+    while (st != -1 && student[st].ID != mID)
+        st = student[st].next;
     return st;
 }
 
-Student* addNewStudent(int mID, int mX, int mY) {
+op int addNewStudent(int mID, int mX, int mY) {
     register int hash = mID % 10007;
-    student[Student::numbers].ID = mID;
-    student[Student::numbers].x = mX;
-    student[Student::numbers].y = mY;
-    student[Student::numbers].next = mapStudent[hash];
-    mapStudent[hash] = &student[Student::numbers++];
+    student[studentNumber].ID = mID;
+    student[studentNumber].x = mX;
+    student[studentNumber].y = mY;
+    student[studentNumber].next = mapStudent[hash];
+    mapStudent[hash] = studentNumber++;
     return mapStudent[hash];
 }
 
-void assign(Student* studentIn) {
-    Heap<School> pschool;
-    for (register int i = 0; i < School::number; i++) {
-        school[i].calculatedistance(studentIn->x, studentIn->y);
-        pschool.insert(&school[i]);
+op void assign(Student* studentIn) {
+    Heap<School> qSchool;
+    for (register int i = 0; i < schoolNumber; i++) {
+        school[i].calculateDistance(studentIn->x, studentIn->y);
+        qSchool.insert(&school[i]);
     }
-    while (pschool.size != 0) {
-        register School* t = pschool.pop();
-        if (((Heap<Student>*)t->assigned)->size < School::capacity) {
-            t->insert(studentIn);
-            studentIn->schoola = t;
+    register School* t;
+    while (qSchool.size != 0) {
+        t = qSchool.pop();
+        if (t->assigned->size < capacity) {
+            t->assigned->insert(studentIn);
+            studentIn->schoolIn = t;
             return;
-        }
-        else if (*studentIn < *assgined[t->ID].top()) {
-            register Student* studentOut = assgined[t->ID].pop();
-            assgined[t->ID].insert(studentIn);
-            studentIn->schoola = t;
+        } else if (*studentIn < *t->assigned->top()) {
+            register Student* studentOut = t->assigned->pop();
+            t->assigned->insert(studentIn);
+            studentIn->schoolIn = t;
             assign(studentOut);
             return;
-        }
-        else {
-            wantAssign[t->ID].insert(studentIn);
+        } else {
+            t->wishlist->insert(studentIn);
         }
     }
 }
 
-void kickout(Student* studentOut) {
-    School* curSchool = (School*)studentOut->schoola;
-    Heap<Student>* curAsigned = (Heap<Student>*)curSchool->assigned;
-    Heap<Student>* wishList = (Heap<Student>*)curSchool->wishlist;
-    curAsigned->erase(studentOut);
-    if (curAsigned->size == School::capacity - 1) {
-        if (wishList->size == 0)
+op void kickOut(Student* studentOut) {
+    studentOut->schoolIn->assigned->erase(studentOut);
+    if (studentOut->schoolIn->assigned->size == capacity - 1) {
+        if (studentOut->schoolIn->wishlist->size == 0)
             return;
-        register Student* studentIn = wishList->pop();
-        while (studentIn->schoola == 0 && wishList->size != 0) {
-            studentIn = wishList->pop();
+        register Student* studentIn = studentOut->schoolIn->wishlist->pop();
+        while (studentIn->schoolIn == 0 && studentOut->schoolIn->wishlist->size != 0) {
+            studentIn = studentOut->schoolIn->wishlist->pop();
         }
-        if (studentIn->schoola != 0) {
-            kickout(studentIn);
-            curAsigned->insert(studentIn);
-            studentIn->schoola = studentOut->schoola;
+        if (studentIn->schoolIn != 0) {
+            kickOut(studentIn);
+            studentOut->schoolIn->assigned->insert(studentIn);
+            studentIn->schoolIn = studentOut->schoolIn;
         }
     }
-    studentOut->schoola = 0;
+    studentOut->schoolIn = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void init(int C, int N, int mX[], int mY[]) {
-    School::number = N;
-    School::capacity = C;
-    Student::numbers = 0;
+op void init(int C, int N, int mX[], int mY[]) {
+    schoolNumber = N;
+    capacity = C;
+    studentNumber = 0;
     for (register int i = 0; i < 10007; i++)
-        mapStudent[i] = 0;
+        mapStudent[i] = -1;
     for (register int i = 0; i < N; i++) {
-        assgined[i].init(true);
-        wantAssign[i].init();
         school[i].x = mX[i];
         school[i].y = mY[i];
         school[i].ID = i;
-        school[i].assigned = &assgined[i];
-        school[i].wishlist = &wantAssign[i];
+        school[i].assigned->init(true);
+        school[i].wishlist->init();
     }
-    return;
 }
 
-int add(int mStudent, int mX, int mY) {  // 7.500
-    register Student* st = findStudent(mStudent);
-    if (st == 0)
-        st = addNewStudent(mStudent, mX, mY);
+op int add(int mStudent, int mX, int mY) {  // 7.500
+    register int id = findStudent(mStudent);
+    if (id == -1)
+        id = addNewStudent(mStudent, mX, mY);
     else {
-        st->x = mX;
-        st->y = mY;
+        student[id].x = mX;
+        student[id].y = mY;
     }
-    st->calculatedistance();
-    assign(st);
-    return st->schoola->ID;
+    student[id].calculateDistance();
+    assign(&student[id]);
+    return student[id].schoolIn->ID;
 }
 
-int remove(int mStudent) {  // 1.500
-    register Student* st = findStudent(mStudent);
-    register int ret = st->schoola->ID;
-    kickout(st);
+op int remove(int mStudent) {  // 1.500
+    register int st = findStudent(mStudent),
+                 ret = student[st].schoolIn->ID;
+    kickOut(&student[st]);
     return ret;
 }
 
-int status(int mSchool) {  // 10.000
-    return assgined[mSchool].size;
+op int status(int mSchool) {  // 10.000
+    return school[mSchool].assigned->size;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
